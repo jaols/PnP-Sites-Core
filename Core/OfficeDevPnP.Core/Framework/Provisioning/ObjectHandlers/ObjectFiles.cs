@@ -181,6 +181,12 @@ namespace OfficeDevPnP.Core.Framework.Provisioning.ObjectHandlers
                             file.LocalizeWebParts(web, parser, targetFile, scope);
                         }
 #endif
+                        //Set file properties before publish
+                        if (file.Properties != null && file.Properties.Any())
+                        {
+                            Dictionary<string, string> transformedProperties = file.Properties.ToDictionary(property => property.Key, property => parser.ParseString(property.Value));
+                            SetFileProperties(targetFile, transformedProperties, parser, false);
+                        }
 
                         switch (file.Level)
                         {
@@ -210,12 +216,6 @@ namespace OfficeDevPnP.Core.Framework.Provisioning.ObjectHandlers
                             (file.Security.ClearSubscopes == true || file.Security.CopyRoleAssignments == true || file.Security.RoleAssignments.Count > 0))
                         {
                             targetFile.ListItemAllFields.SetSecurity(parser, file.Security);
-                        }
-
-                        if (file.Properties != null && file.Properties.Any())
-                        {
-                            Dictionary<string, string> transformedProperties = file.Properties.ToDictionary(property => property.Key, property => parser.ParseString(property.Value));
-                            SetFileProperties(targetFile, transformedProperties, parser, false);
                         }
 
                     }
